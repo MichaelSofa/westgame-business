@@ -20,55 +20,56 @@ if __name__ == '__main__':
     depot_pictures = [depot_picture1, depot_picture2, depot_picture3, depot_picture4]
     
     ft = put_chinese_text(r'./FZXSSJW.TTF')
-    for i in range(1000):
+    for i in range(300):
+        os.mkdir('./output/'+str(i))
         select_ind = random.randint(0,2499)
         select_char = chinese_characters[select_ind]
-
-        # color_ = (30, 50, 150) # Green
-        color_ = np.random.randint(100, 255, 3, dtype=np.uint8)
-        text_size = random.randint(20, 40)
-        y_scale = 1 + 0.4*(random.random()-0.5)
-        x_shear = (random.random()-0.5) * 0.8
-        y_shear = (random.random()-0.5) * 0.8
-        images = ft.generate_one(select_char, text_size, y_scale, x_shear, y_shear, color_)
-        image = images[0]  # 没有背景的验证码
-        # 文字验证码随机剪裁掉上边或下边的一部分
-        if random.random() > 0.7:  # 进行剪裁
-            cut_length = int((random.random()*0.5+0.5)*image.shape[0])
-            if random.random() > 0.5:  # 上方剪裁
-                image = image[-cut_length:,:,:]
-            else:  # 下方剪裁
-                image = image[0:cut_length, :, :]
-        # 添加背景
-        back_ind = random.randint(0,3)
-        depot_picture = depot_pictures[back_ind].copy()
-        # 背景颜色加深
-        alpha1 = 0.5 + random.random()*0.2
-        alpha2 = 0.5 + random.random()*0.2
-        alpha3 = 0.5 + random.random()*0.2
-        depot_picture[:, :, 0] = depot_picture[:, :, 0]*alpha1
-        depot_picture[:, :, 1] = depot_picture[:, :, 1]*alpha2
-        depot_picture[:, :, 2] = depot_picture[:, :, 2]*alpha3 
-        # 背景剪裁
-        image_height, image_width = image.shape[:2]
-        back_height, back_width = depot_picture.shape[:2]
-        cut_height = random.randint(0, back_height - image_height -1)
-        cut_width = random.randint(0, back_width - image_width - 1)
-        cut_background = depot_picture[cut_height:cut_height+image_height, cut_width:cut_width+image_width, :]
-        
-        # 验证码添加到背景上
-        # cut_background[image!=0] = image[image!=0]
-        image_float = image.astype(np.float64)
-        sub_image_float = 255 - image_float
-        image_float = image_float/255*color_
-        cut_background_float = cut_background.astype(np.float64)
-        cut_background_float = sub_image_float/255*cut_background_float
-        cut_background_float = cut_background_float + image_float
-        cut_background = cut_background_float.astype(np.uint8)
+        for j in range(10):
+            # color_ = (30, 50, 150) # Green
+            color_ = np.random.randint(100, 255, 3, dtype=np.uint8)
+            text_size = random.randint(20, 40)
+            y_scale = 1 + 0.4*(random.random()-0.5)
+            x_shear = (random.random()-0.5) * 0.8
+            y_shear = (random.random()-0.5) * 0.8
+            images = ft.generate_one(select_char, text_size, y_scale, x_shear, y_shear, color_)
+            image = images[0]  # 没有背景的验证码
+            # 文字验证码随机剪裁掉上边或下边的一部分
+            if random.random() > 0.7:  # 进行剪裁
+                cut_length = int((random.random()*0.5+0.5)*image.shape[0])
+                if random.random() > 0.5:  # 上方剪裁
+                    image = image[-cut_length:,:,:]
+                else:  # 下方剪裁
+                    image = image[0:cut_length, :, :]
+            # 添加背景
+            back_ind = random.randint(0,3)
+            depot_picture = depot_pictures[back_ind].copy()
+            # 背景颜色加深
+            alpha1 = 0.5 + random.random()*0.2
+            alpha2 = 0.5 + random.random()*0.2
+            alpha3 = 0.5 + random.random()*0.2
+            depot_picture[:, :, 0] = depot_picture[:, :, 0]*alpha1
+            depot_picture[:, :, 1] = depot_picture[:, :, 1]*alpha2
+            depot_picture[:, :, 2] = depot_picture[:, :, 2]*alpha3 
+            # 背景剪裁
+            image_height, image_width = image.shape[:2]
+            back_height, back_width = depot_picture.shape[:2]
+            cut_height = random.randint(0, back_height - image_height -1)
+            cut_width = random.randint(0, back_width - image_width - 1)
+            cut_background = depot_picture[cut_height:cut_height+image_height, cut_width:cut_width+image_width, :]
+            
+            # 验证码添加到背景上
+            # cut_background[image!=0] = image[image!=0]
+            image_float = image.astype(np.float64)
+            sub_image_float = 255 - image_float
+            image_float = image_float/255*color_
+            cut_background_float = cut_background.astype(np.float64)
+            cut_background_float = sub_image_float/255*cut_background_float
+            cut_background_float = cut_background_float + image_float
+            cut_background = cut_background_float.astype(np.uint8)
+            cv.imwrite('./output/'+str(i)+'/'+str(i)+"_"+str(j)+'.png', cut_background)
         
         # 背景对应汉字的原始汉字灰度图
         images2 = ft.generate_one(select_char, 50, 1.0, 0.0, 0.0, None)
         image2 = images2[0]  
-        cv.imwrite('./output/'+str(i)+'.png', cut_background)
-        cv.imwrite('./output/'+str(i)+'_org.png', image2)
+        cv.imwrite('./output/'+str(i)+'/'+str(i)+'_org.png', image2)
         print(select_char)
